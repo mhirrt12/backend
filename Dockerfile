@@ -12,13 +12,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first (for better caching)
+# Copy composer files first (for caching)
 COPY composer.json ./
 
-# Install PHP dependencies (PHPMailer)
+# Install PHP dependencies (this creates the vendor folder)
 RUN composer install --no-dev --optimize-autoloader
 
 # Copy the rest of your application
