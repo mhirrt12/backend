@@ -1,13 +1,30 @@
 FROM php:8.2-apache
 
+# Install system dependencies and Composer
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 # Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Copy your app
-COPY . /var/www/html/
+# Set working directory
+WORKDIR /var/www/html
 
-# Use the default Apache port (Render maps 10000 to 80)
+# Copy composer files first (for better caching)
+COPY composer.json ./
+
+# Install PHP dependencies (PHPMailer)
+RUN composer install --no-dev --optimize-autoloader
+
+# Copy the rest of your application
+COPY . .
+
+# Create .htaccess for routing
+RUN echo "RewriteEngine On\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^ index.php [QSA,L]" > /var/www/html/.htaccess
+
 EXPOSE 80
-
-# Apache stays in foreground
-CMD ["apache2-foreground"]
