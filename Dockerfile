@@ -1,16 +1,13 @@
-# Dockerfile
-FROM thecodingmachine/php:8.2-v4-apache
+FROM php:8.2-apache
 
-# Enable Apache rewrite module
+# Enable mod_rewrite
 RUN a2enmod rewrite
 
-# Copy your application code into the container
+# Copy your app
 COPY . /var/www/html/
 
-# Set Apache to use your index.php for routing
-RUN echo "\n\
-<Directory /var/www/html/>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>" > /etc/apache2/sites-available/000-default.conf
+# Use the default Apache port (Render maps 10000 to 80)
+EXPOSE 80
+
+# Apache stays in foreground
+CMD ["apache2-foreground"]
