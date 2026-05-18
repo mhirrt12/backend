@@ -1,10 +1,18 @@
 FROM php:8.2-apache
 
-# Install Composer
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpng-dev \
+    libzip-dev \
+    ca-certificates \
+    && docker-php-ext-install pdo_mysql \
+    && update-ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Enable mod_rewrite and install MySQLi & PDO MySQL (some images may already have it, but ensure)
-RUN docker-php-ext-install pdo_mysql mysqli && a2enmod rewrite
+RUN a2enmod rewrite
 
 WORKDIR /var/www/html
 

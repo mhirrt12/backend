@@ -33,8 +33,16 @@ $db_name = getenv('DB_NAME');
 $db_user = getenv('DB_USER');
 $db_pass = getenv('DB_PASS');
 
+// TiDB requires TLS. Use ssl_mode=VERIFY_IDENTITY
+$dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4";
+
+$options = [
+    PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/certs/ca-certificates.crt', // System CA bundle
+    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+];
+
 try {
-    $pdo = new PDO("mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
+    $pdo = new PDO($dsn, $db_user, $db_pass, $options);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     http_response_code(500);
