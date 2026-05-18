@@ -4,6 +4,9 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    libpng-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
@@ -17,7 +20,7 @@ WORKDIR /var/www/html
 # Copy composer files first (for caching)
 COPY composer.json ./
 
-# Install PHP dependencies (this creates the vendor folder)
+# Install PHP dependencies (PHPMailer)
 RUN composer install --no-dev --optimize-autoloader
 
 # Copy the rest of your application
