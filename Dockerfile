@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install system dependencies and Composer
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -12,12 +12,13 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Enable mod_rewrite
+# Enable mod_rewrite for clean URLs
 RUN a2enmod rewrite
 
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first (for caching)
+# Copy composer files first (for better caching)
 COPY composer.json ./
 
 # Install PHP dependencies (PHPMailer)
